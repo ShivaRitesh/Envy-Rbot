@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Envy - All-in-One Personal Assistant Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- FontAwesome for Premium Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand">
+        <i class="fa-solid fa-wand-magic-sparkles logo-icon"></i>
+        <span>Envy</span>
+      </div>
+      <nav class="nav-menu">
+        <a href="#" class="nav-item active" data-tab="dashboard">
+          <i class="fa-solid fa-chart-simple"></i> Dashboard
+        </a>
+        <a href="#" class="nav-item" data-tab="chat">
+          <i class="fa-solid fa-comment-dots"></i> AI Assistant
+        </a>
+        <a href="#" class="nav-item" data-tab="prompts">
+          <i class="fa-solid fa-image"></i> Prompt Architect
+        </a>
+        <a href="#" class="nav-item" data-tab="tasks">
+          <i class="fa-solid fa-list-check"></i> Tasks & Alerts
+        </a>
+        <a href="#" class="nav-item" data-tab="linkedin">
+          <i class="fa-brands fa-linkedin"></i> LinkedIn Post
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <button id="settings-btn" class="footer-btn">
+          <i class="fa-solid fa-gear"></i> Settings
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      
+      <!-- Top header bar -->
+      <header class="top-header">
+        <div class="header-title">
+          <h1 id="page-title">Dashboard Overview</h1>
+          <p id="page-subtitle">Your personal workspace & automations status</p>
+        </div>
+        <div class="header-actions">
+          <div class="status-indicator connected" id="api-status">
+            <span class="status-dot"></span> <span id="status-text">Connecting Sheets...</span>
+          </div>
+          <button id="quick-log-btn" class="btn btn-primary btn-sm">
+            <i class="fa-solid fa-plus"></i> Log Activity
+          </button>
+        </div>
+      </header>
+
+      <!-- Content Views (Tabs) -->
+      <div class="content-container">
+        
+        <!-- Tab 1: Dashboard Overview -->
+        <section id="tab-dashboard" class="tab-view active">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fa-solid fa-square-check"></i></div>
+              <div class="stat-info">
+                <h3>Pending Tasks</h3>
+                <p id="pending-tasks-count">0</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fa-solid fa-bell"></i></div>
+              <div class="stat-info">
+                <h3>Reminders Today</h3>
+                <p id="active-reminders-count">0</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fa-solid fa-book"></i></div>
+              <div class="stat-info">
+                <h3>Logs Recorded</h3>
+                <p id="logs-count">0</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fa-brands fa-linkedin-in"></i></div>
+              <div class="stat-info">
+                <h3>LinkedIn Drafts</h3>
+                <p id="li-drafts-count">0</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="dashboard-details-grid">
+            <!-- Tasks quick view -->
+            <div class="card col-2">
+              <div class="card-header">
+                <h2>Important Tasks</h2>
+                <a href="#" class="card-link" data-tab-link="tasks">View all</a>
+              </div>
+              <div class="card-body">
+                <ul class="task-list" id="quick-tasks">
+                  <li class="empty-state">No pending tasks. Great job!</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Recent logs -->
+            <div class="card">
+              <div class="card-header">
+                <h2>Recent Work Logs</h2>
+              </div>
+              <div class="card-body">
+                <ul class="log-list scrollable" id="quick-logs">
+                  <li class="empty-state">No logs recorded yet.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tab 2: AI Chat Assistant -->
+        <section id="tab-chat" class="tab-view">
+          <div class="chat-container card">
+            <div class="chat-messages" id="chat-messages">
+              <div class="message assistant">
+                <div class="message-avatar"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                <div class="message-content">
+                  <p>Hello! I am Envy, your personal assistant. Tell me what you need, and I will handle it. I will keep track of your tasks, log your activities, and generate prompts or drafts for you.</p>
+                </div>
+              </div>
+            </div>
+            <div class="chat-input-area">
+              <textarea id="chat-input" placeholder="Ask me anything, or explain a problem..." rows="1"></textarea>
+              <button id="chat-send" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tab 3: Prompt Architect -->
+        <section id="tab-prompts" class="tab-view">
+          <div class="prompt-architect-grid">
+            
+            <!-- Controls panel -->
+            <div class="card">
+              <div class="card-header">
+                <h2>Prompt Customizer</h2>
+              </div>
+              <div class="card-body">
+                <form id="prompt-form">
+                  <div class="form-group">
+                    <label for="prompt-type">Generation Type</label>
+                    <select id="prompt-type" class="form-control">
+                      <option value="image">Image (Midjourney, DALL-E 3, etc.)</option>
+                      <option value="video">Video (Sora, Runway Gen-2, etc.)</option>
+                    </select>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label for="prompt-subject">Core Subject / Description</label>
+                    <textarea id="prompt-subject" class="form-control" rows="3" placeholder="Describe the scene or object you want to generate (e.g. 'A futuristic city in the style of cyberpunk with rain')."></textarea>
+                  </div>
+
+                  <!-- Image specific options -->
+                  <div class="image-options">
+                    <div class="form-group">
+                      <label for="prompt-style">Preset Style</label>
+                      <select id="prompt-style" class="form-control">
+                        <option value="photorealistic">Photorealistic / Hyper-detailed</option>
+                        <option value="cinematic">Cinematic Lighting</option>
+                        <option value="3d-render">3D Render (Unreal Engine 5)</option>
+                        <option value="cyberpunk">Cyberpunk / Neon</option>
+                        <option value="anime">Anime / Studio Ghibli</option>
+                        <option value="minimalist">Minimalist / Vector Art</option>
+                        <option value="none">None (Raw Description)</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="prompt-ratio">Aspect Ratio</label>
+                      <select id="prompt-ratio" class="form-control">
+                        <option value="16:9">16:9 (Widescreen Landscape)</option>
+                        <option value="1:1">1:1 (Square - Instagram)</option>
+                        <option value="9:16">9:16 (Portrait - Reels/TikTok)</option>
+                        <option value="4:3">4:3 (Classic TV)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- Video specific options -->
+                  <div class="video-options hidden">
+                    <div class="form-group">
+                      <label for="video-camera">Camera Motion</label>
+                      <select id="video-camera" class="form-control">
+                        <option value="slow-zoom">Slow Zoom In</option>
+                        <option value="panning">Dynamic Panning Shot</option>
+                        <option value="crane-up">Crane Shot Upwards</option>
+                        <option value="drone-orbit">FPV Drone Orbit</option>
+                        <option value="static">Static Camera</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="video-motion">Motion Speed</label>
+                      <select id="video-motion" class="form-control">
+                        <option value="slow">Slow Motion / Dreamy</option>
+                        <option value="normal">Normal / Realistic Motion</option>
+                        <option value="fast">High-speed Action</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="prompt-engine">Target Tool</label>
+                    <select id="prompt-engine" class="form-control">
+                      <option value="midjourney">Midjourney v6</option>
+                      <option value="dalle3">DALL-E 3</option>
+                      <option value="sdxl">Stable Diffusion XL</option>
+                      <option value="runway">Runway Gen-3</option>
+                      <option value="sora">OpenAI Sora</option>
+                    </select>
+                  </div>
+
+                  <button type="button" id="generate-prompt-btn" class="btn btn-primary btn-block">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Pro Prompt
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            <!-- Result panel -->
+            <div class="card">
+              <div class="card-header">
+                <h2>Generated Result & Guide</h2>
+              </div>
+              <div class="card-body prompt-result-body">
+                <div id="prompt-result-placeholder" class="result-placeholder">
+                  <i class="fa-solid fa-code logo-icon"></i>
+                  <p>Configure parameters on the left and click "Generate Pro Prompt" to build a perfect prompt structure.</p>
+                </div>
+                <div id="prompt-result-content" class="result-content hidden">
+                  <div class="result-box">
+                    <h3>Perfect Prompt Structure:</h3>
+                    <div class="prompt-text-wrapper">
+                      <code id="final-prompt-text">Your prompt will appear here...</code>
+                      <button id="copy-prompt-btn" class="btn btn-secondary btn-sm" title="Copy Prompt">
+                        <i class="fa-solid fa-copy"></i> Copy
+                      </button>
+                    </div>
+                  </div>
+                  <div class="guide-box">
+                    <h3>How to use on <span id="tool-name">Midjourney</span>:</h3>
+                    <div id="guide-steps" class="guide-steps">
+                      <!-- Steps injected dynamically -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Tab 4: Tasks & Reminders -->
+        <section id="tab-tasks" class="tab-view">
+          <div class="tasks-reminders-grid">
+            
+            <!-- Tasks manager -->
+            <div class="card">
+              <div class="card-header">
+                <h2>Daily Tasks</h2>
+                <button id="new-task-btn" class="btn btn-secondary btn-sm"><i class="fa-solid fa-plus"></i> Add Task</button>
+              </div>
+              <div class="card-body">
+                <ul class="task-list main-task-list" id="all-tasks">
+                  <!-- Injected Tasks -->
+                </ul>
+              </div>
+            </div>
+
+            <!-- Reminders manager -->
+            <div class="card">
+              <div class="card-header">
+                <h2>Reminders & Email Alerts</h2>
+                <button id="new-reminder-btn" class="btn btn-secondary btn-sm"><i class="fa-solid fa-plus"></i> Add Reminder</button>
+              </div>
+              <div class="card-body">
+                <div class="reminder-status-info">
+                  <i class="fa-solid fa-info-circle"></i>
+                  <p>Active reminders will be push-notified in your browser and automatically sent to your Email address at the configured time.</p>
+                </div>
+                <ul class="reminder-list" id="all-reminders">
+                  <!-- Injected Reminders -->
+                </ul>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Tab 5: LinkedIn Poster -->
+        <section id="tab-linkedin" class="tab-view">
+          <div class="card">
+            <div class="card-header">
+              <h2>Today's Generated LinkedIn Drafts</h2>
+              <button id="refresh-li-btn" class="btn btn-secondary btn-sm"><i class="fa-solid fa-arrows-rotate"></i> Sync Drafts</button>
+            </div>
+            <div class="card-body">
+              <p class="section-description">Below are the three auto-generated drafts written by your cloud agent today. Click to copy a draft and open LinkedIn instantly.</p>
+              
+              <div class="linkedin-drafts-container" id="linkedin-drafts">
+                <div class="empty-state">No LinkedIn posts generated for today yet. Make sure your GitHub Actions script is configured and running.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal: Settings -->
+  <div class="modal-overlay" id="settings-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Envy Configuration</h2>
+        <button class="modal-close" id="settings-close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="settings-form">
+          <div class="form-group">
+            <label for="config-sheet-url">Google Sheets Apps Script Web App URL</label>
+            <input type="url" id="config-sheet-url" class="form-control" placeholder="https://script.google.com/macros/s/.../exec">
+            <small class="form-text text-muted">Web App endpoint deployed from your Google Sheet script editor.</small>
+          </div>
+          
+          <div class="form-group">
+            <label for="config-gemini-key">Gemini API Key (Runs local AI chatbot)</label>
+            <input type="password" id="config-gemini-key" class="form-control" placeholder="AIzaSy...">
+            <small class="form-text text-muted">Stored locally in your browser. Never uploaded to any servers.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="config-email">Alert Email Address</label>
+            <input type="email" id="config-email" class="form-control" placeholder="your-email@gmail.com">
+            <small class="form-text text-muted">A free email alert will be sent directly via Google Sheets when reminders trigger.</small>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" style="margin-top: 1.5rem;">Save Configuration</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Add Task -->
+  <div class="modal-overlay" id="task-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Add New Task</h2>
+        <button class="modal-close" id="task-close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="task-form">
+          <div class="form-group">
+            <label for="task-name">Task Name</label>
+            <input type="text" id="task-name" class="form-control" required placeholder="e.g. Finish landing page design">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="task-date">Due Date & Time</label>
+              <input type="datetime-local" id="task-date" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label for="task-priority">Priority</label>
+              <select id="task-priority" class="form-control">
+                <option value="High">🔴 High</option>
+                <option value="Medium" selected>🟡 Medium</option>
+                <option value="Low">🟢 Low</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" style="margin-top: 1.5rem;">Add Task</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Add Reminder -->
+  <div class="modal-overlay" id="reminder-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Add Alert Reminder</h2>
+        <button class="modal-close" id="reminder-close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="reminder-form">
+          <div class="form-group">
+            <label for="reminder-msg">Reminder Message</label>
+            <input type="text" id="reminder-msg" class="form-control" required placeholder="e.g. Drink water or call client">
+          </div>
+          <div class="form-group">
+            <label for="reminder-time">Reminder Date & Time</label>
+            <input type="datetime-local" id="reminder-time" class="form-control" required>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" style="margin-top: 1.5rem;">Create Alert</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Log Activity -->
+  <div class="modal-overlay" id="log-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Log Activity</h2>
+        <button class="modal-close" id="log-close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="log-form">
+          <div class="form-group">
+            <label for="log-activity">What did you do?</label>
+            <input type="text" id="log-activity" class="form-control" required placeholder="e.g. Worked on UI features or Solved login bugs">
+          </div>
+          <div class="form-group">
+            <label for="log-details">Details</label>
+            <textarea id="log-details" class="form-control" rows="3" placeholder="Explain your progress, blockers, or fixes."></textarea>
+          </div>
+          <div class="form-group">
+            <label for="log-mood">Work Mood / Focus</label>
+            <select id="log-mood" class="form-control">
+              <option value="⚡ Productive" selected>⚡ Productive</option>
+              <option value="😌 Relaxed">😌 Relaxed</option>
+              <option value="🧩 Focused">🧩 Focused</option>
+              <option value="🚧 Blocked">🚧 Blocked</option>
+              <option value="💤 Tired">💤 Tired</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" style="margin-top: 1.5rem;">Save Work Log</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
