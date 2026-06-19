@@ -307,16 +307,44 @@
 
         <!-- Tab 5: LinkedIn Poster -->
         <section id="tab-linkedin" class="tab-view">
+          <!-- Input Form for Topics -->
+          <div class="card" style="margin-bottom: 2rem;">
+            <div class="card-header">
+              <h2>Write Daily LinkedIn Posts</h2>
+            </div>
+            <div class="card-body">
+              <p class="section-description" style="margin-bottom: 1.25rem;">Tell Envy what 3 subjects you want to talk about today, and she will draft them for you instantly.</p>
+              <form id="linkedin-topics-form">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="li-topic-1">Subject #1</label>
+                    <input type="text" id="li-topic-1" class="form-control" placeholder="e.g. Solving a react re-render bug..." required>
+                  </div>
+                  <div class="form-group">
+                    <label for="li-topic-2">Subject #2</label>
+                    <input type="text" id="li-topic-2" class="form-control" placeholder="e.g. Future of serverless database..." required>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="li-topic-3">Subject #3</label>
+                  <input type="text" id="li-topic-3" class="form-control" placeholder="e.g. 5 productivity tips for developers..." required>
+                </div>
+                <button type="submit" id="generate-li-drafts-btn" class="btn btn-primary">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i> Ask Envy to Draft Posts
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Drafts Display -->
           <div class="card">
             <div class="card-header">
-              <h2>Today's Generated LinkedIn Drafts</h2>
+              <h2>Today's Generated Drafts</h2>
               <button id="refresh-li-btn" class="btn btn-secondary btn-sm"><i class="fa-solid fa-arrows-rotate"></i> Sync Drafts</button>
             </div>
             <div class="card-body">
-              <p class="section-description">Below are the three auto-generated drafts written by your cloud agent today. Click to copy a draft and open LinkedIn instantly.</p>
-              
               <div class="linkedin-drafts-container" id="linkedin-drafts">
-                <div class="empty-state">No LinkedIn posts generated for today yet. Make sure your GitHub Actions script is configured and running.</div>
+                <div class="empty-state">No drafts generated for today yet. Enter your subjects above to let Envy write them!</div>
               </div>
             </div>
           </div>
