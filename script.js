@@ -525,6 +525,89 @@ elements.refreshLiBtn.addEventListener('click', () => {
   syncData();
 });
 
+// Add topic form listener for custom LinkedIn draft generation
+document.getElementById('linkedin-topics-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  if (!state.config.geminiKey) {
+    showNotification("API Key Required", "Please add your Gemini API Key in settings first.", "warning");
+    return;
+  }
+  
+  const topics = [
+    document.getElementById('li-topic-1').value.trim(),
+    document.getElementById('li-topic-2').value.trim(),
+    document.getElementById('li-topic-3').value.trim()
+  ];
+  
+  const generateBtn = document.getElementById('generate-li-drafts-btn');
+  const originalHtml = generateBtn.innerHTML;
+  generateBtn.disabled = true;
+  generateBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Envy is writing...`;
+  
+  showNotification("Drafting Posts...", "Envy is generating your 3 posts.");
+  
+  const todayStr = new Date().toISOString().split('T')[0];
+  
+  for (let i = 0; i < 3; i++) {
+    const topicName = `Daily Topic #${i+1}`;
+    const subject = topics[i];
+    
+    // Generate draft using local Gemini
+    const draftText = await generateDraftViaGemini(subject);
+    
+    // Save draft to sheet
+    await postToSheet({
+      action: "updateLinkedInPost",
+      date: todayStr,
+      topic: topicName,
+      draft: draftText,
+      status: "Draft"
+    });
+  }
+  
+  generateBtn.disabled = false;
+  generateBtn.innerHTML = originalHtml;
+  
+  showNotification("Drafts Completed!", "All 3 LinkedIn posts have been generated and synced.");
+  document.getElementById('linkedin-topics-form').reset();
+  syncData();
+});
+
+async function generateDraftViaGemini(subject) {
+  const prompt = `Write an engaging, high-quality LinkedIn post about the following subject:
+"${subject}"
+
+Guidelines:
+1. Hook the reader in the first 2 lines.
+2. Use short, readable paragraphs (1-2 sentences max).
+3. Include bullet points or clear spacing.
+4. Keep a professional yet personal tone (share a key lesson, problem solved, or valuable tip).
+5. Add 3-5 relevant hashtags at the very end.
+6. Include emojis naturally to make it visually engaging but keep it professional.
+7. Avoid boring corporate jargon.
+
+Return only the final LinkedIn post content (do not include introductory or concluding conversational text).`;
+
+  try {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${state.config.geminiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }]
+      })
+    });
+    
+    const data = await response.json();
+    if (data.candidates && data.candidates[0].content.parts[0].text) {
+      return data.candidates[0].content.parts[0].text.trim();
+    }
+  } catch (error) {
+    console.error("Gemini failed to generate draft:", error);
+  }
+  return "Failed to generate draft. Please check your API key.";
+}
+
 // ----------------------------------------------------
 // Prompt Architect Logic (Zero Cost Prompt Engineering)
 // ----------------------------------------------------
