@@ -107,11 +107,22 @@ if (Notification.permission === 'default') {
 // Navigation
 // ----------------------------------------------------
 function initNavigation() {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  const menuBtn = document.getElementById('mobile-menu-btn');
+  const closeBtn = document.getElementById('mobile-menu-close');
+
+  const closeSidebar = () => {
+    if (sidebar) sidebar.classList.remove('active');
+    if (overlay) overlay.classList.remove('active');
+  };
+
   elements.navItems.forEach(item => {
     item.addEventListener('click', (e) => {
       e.preventDefault();
       const tabName = item.getAttribute('data-tab');
       switchTab(tabName);
+      closeSidebar();
     });
   });
 
@@ -120,8 +131,24 @@ function initNavigation() {
     link.addEventListener('click', (e) => {
       e.preventDefault();
       switchTab(link.getAttribute('data-tab-link'));
+      closeSidebar();
     });
   });
+
+  if (menuBtn) {
+    menuBtn.addEventListener('click', () => {
+      if (sidebar) sidebar.classList.add('active');
+      if (overlay) overlay.classList.add('active');
+    });
+  }
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', closeSidebar);
+  }
+
+  if (overlay) {
+    overlay.addEventListener('click', closeSidebar);
+  }
 }
 
 function switchTab(tabName) {
