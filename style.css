@@ -893,3 +893,165 @@ body {
   animation: fadeIn 0.2s ease-in-out;
 }
 
+/* Mobile Drawer Menu elements default hidden on desktop */
+.mobile-menu-btn {
+  display: none;
+}
+
+.mobile-menu-close {
+  display: none;
+}
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+.sidebar-overlay.active {
+  display: block;
+}
+
+/* Responsive Media Queries */
+@media (max-width: 768px) {
+  .app-container {
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px;
+    width: 280px;
+    height: 100vh;
+    z-index: 1010;
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-lg);
+    background-color: var(--bg-sidebar);
+  }
+
+  .sidebar.active {
+    left: 0;
+  }
+
+  .mobile-menu-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    font-size: 1rem;
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .mobile-menu-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+
+  .mobile-menu-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+
+  .mobile-menu-close:hover {
+    color: var(--text-primary);
+  }
+
+  .brand {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 2rem;
+  }
+
+  .brand-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .top-header {
+    padding: 1rem 1.25rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .header-actions {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+  }
+
+  .content-container {
+    padding: 1rem 1.25rem;
+    height: calc(100vh - 120px);
+  }
+
+  /* Grid Stack on Mobile */
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .dashboard-details-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .prompt-architect-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .tasks-reminders-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  /* Chat modifications for mobile */
+  .chat-container {
+    height: 70vh;
+  }
+
+  .message {
+    max-width: 90%;
+  }
+
+  .modal {
+    max-width: 100%;
+    max-height: 85vh;
+  }
+}
+
+
