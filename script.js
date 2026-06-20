@@ -599,11 +599,17 @@ Return only the final LinkedIn post content (do not include introductory or conc
     });
     
     const data = await response.json();
-    if (data.candidates && data.candidates[0].content.parts[0].text) {
+    if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text) {
       return data.candidates[0].content.parts[0].text.trim();
+    } else {
+      console.warn("Gemini API warning. Response data:", data);
+      if (data.error && data.error.message) {
+        return `API Error: ${data.error.message}`;
+      }
     }
   } catch (error) {
     console.error("Gemini failed to generate draft:", error);
+    return `JavaScript Error: ${error.message}`;
   }
   return "Failed to generate draft. Please check your API key.";
 }
