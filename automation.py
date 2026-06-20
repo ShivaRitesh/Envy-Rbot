@@ -69,6 +69,41 @@ def run_reminders_and_alerts(data):
             except Exception as ex:
                 print(f"Error parsing reminder time {rem.get('Time')}: {ex}")
 
+def check_evening_review_alert(data):
+    logs = data.get("logs", [])
+    now_local = datetime.datetime.utcnow() + datetime.timedelta(hours=5, minutes=30)
+    today_str = now_local.strftime('%Y-%m-%d')
+    
+    # Check if it is past 6 PM (18:00)
+    if now_local.hour >= 18:
+        already_sent = False
+        for log in logs:
+            log_date_str = log.get("Date", "")
+            if log_date_str and log.get("Activity") == "Evening Check-in Alert":
+                try:
+                    # Parse log date. Handle different possible formats.
+                    log_date_str_clean = log_date_str.split(".")[0].replace("Z", "").replace("T", " ")
+                    log_date = datetime.datetime.strptime(log_date_str_clean[:19], "%Y-%m-%d %H:%M:%S")
+                    # Assume log Date is UTC and convert to local time
+                    log_local = log_date + datetime.timedelta(hours=5, minutes=30)
+                    if log_local.strftime('%Y-%m-%d') == today_str:
+                        already_sent = True
+                        break
+                except Exception as e:
+                    print(f"Error parsing log date {log_date_str}: {e}")
+                    
+        if not already_sent:
+            msg = "👋 Hi Ritesh! It's past 6:00 PM. Time for your evening check-in with Envy!\n\nOpen your Envy Dashboard to log your daily tasks, pending works, and plan your agenda for tomorrow. You can use voice dictation by clicking the microphone icon next to the chat input!"
+            print("Sending evening check-in alert email...")
+            if send_email_alert(msg):
+                # Log success in Sheets
+                requests.post(SHEET_URL, json={
+                    "action": "addLog",
+                    "activity": "Evening Check-in Alert",
+                    "details": "Sent daily review reminder.",
+                    "mood": "⚡ Active"
+                })
+
 def main():
     print("Envy Automation Task Starting...")
     data = get_sheets_data()
@@ -79,7 +114,11 @@ def main():
     # Run reminders check
     run_reminders_and_alerts(data)
     
+    # Run evening check-in review alert check
+    check_evening_review_alert(data)
+    
     print("Envy Automation completed successfully.")
 
 if __name__ == "__main__":
     main()
+
