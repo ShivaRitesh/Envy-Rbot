@@ -845,3 +845,51 @@ body {
   max-height: 250px;
   overflow-y: auto;
 }
+
+/* Social Subtabs inside draft cards */
+.social-subtabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.subtab-btn {
+  background: none;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: var(--font-family);
+  font-size: 0.8rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.2s ease;
+}
+
+.subtab-btn:hover {
+  color: var(--text-primary);
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.subtab-btn.active {
+  color: var(--primary-color);
+  background-color: var(--primary-glow);
+  border-color: rgba(88, 166, 255, 0.2);
+  font-weight: 600;
+}
+
+.subtab-pane {
+  display: none;
+}
+
+.subtab-pane.active {
+  display: block;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
