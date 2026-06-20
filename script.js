@@ -57,6 +57,7 @@ const elements = {
   chatMessages: document.getElementById('chat-messages'),
   chatInput: document.getElementById('chat-input'),
   chatSend: document.getElementById('chat-send'),
+  chatMic: document.getElementById('chat-mic'),
   
   // Prompt Architect
   promptForm: document.getElementById('prompt-form'),
@@ -375,30 +376,105 @@ function renderLinkedInDrafts() {
 
   // Show latest first
   const sortedPosts = [...state.data.linkedin].reverse();
-  sortedPosts.forEach(post => {
+  sortedPosts.forEach((post, index) => {
     const postCard = document.createElement('div');
     postCard.className = 'linkedin-post-card';
     
     const formattedDate = new Date(post.Date).toLocaleDateString([], { month: 'short', day: 'numeric' });
-    
+    const uniqueId = `post-${index}-${Date.now()}`;
+    const linkedinDraft = post.LinkedInDraft || post.DraftPost || '';
+    const twitterDraft = post.TwitterDraft || '';
+    const instagramDraft = post.InstagramDraft || '';
+    const instagramPrompt = post.InstagramPrompt || '';
+
     postCard.innerHTML = `
       <div class="li-post-header">
         <span class="li-post-topic">📌 Subject: ${post.Topic}</span>
         <span class="li-post-date">${formattedDate} - ${post.Status}</span>
       </div>
-      <div class="li-post-content">${post.DraftPost}</div>
-      <div class="li-post-actions">
-        <button class="btn btn-secondary btn-sm" onclick="copyLinkedInDraft(this, \`${encodeURIComponent(post.DraftPost)}\`)">
-          <i class="fa-solid fa-copy"></i> Copy Post
+      
+      <div class="social-subtabs" id="subtabs-${uniqueId}">
+        <button class="subtab-btn active" onclick="switchSocialTab(event, '${uniqueId}', 'linkedin')">
+          <i class="fa-brands fa-linkedin"></i> LinkedIn
         </button>
-        <a href="https://www.linkedin.com/feed/" target="_blank" class="btn btn-primary btn-sm">
-          <i class="fa-brands fa-linkedin"></i> Post to LinkedIn
-        </a>
+        <button class="subtab-btn" onclick="switchSocialTab(event, '${uniqueId}', 'twitter')">
+          <i class="fa-brands fa-twitter"></i> Twitter/X
+        </button>
+        <button class="subtab-btn" onclick="switchSocialTab(event, '${uniqueId}', 'instagram')">
+          <i class="fa-brands fa-instagram"></i> Instagram
+        </button>
+        <button class="subtab-btn" onclick="switchSocialTab(event, '${uniqueId}', 'midjourney')">
+          <i class="fa-solid fa-image"></i> Image Prompt
+        </button>
+      </div>
+
+      <div class="social-subtabs-content" id="content-${uniqueId}">
+        <div class="subtab-pane active" data-pane="linkedin">
+          <div class="li-post-content">${linkedinDraft}</div>
+          <div class="li-post-actions">
+            <button class="btn btn-secondary btn-sm" onclick="copyLinkedInDraft(this, \`${encodeURIComponent(linkedinDraft)}\`)">
+              <i class="fa-solid fa-copy"></i> Copy Post
+            </button>
+            <a href="https://www.linkedin.com/feed/" target="_blank" class="btn btn-primary btn-sm">
+              <i class="fa-brands fa-linkedin"></i> Post to LinkedIn
+            </a>
+          </div>
+        </div>
+
+        <div class="subtab-pane" data-pane="twitter">
+          <div class="li-post-content">${twitterDraft}</div>
+          <div class="li-post-actions">
+            <button class="btn btn-secondary btn-sm" onclick="copyLinkedInDraft(this, \`${encodeURIComponent(twitterDraft)}\`)">
+              <i class="fa-solid fa-copy"></i> Copy Tweet
+            </button>
+            <a href="https://x.com/intent/post?text=${encodeURIComponent(twitterDraft)}" target="_blank" class="btn btn-primary btn-sm">
+              <i class="fa-brands fa-twitter"></i> Post to Twitter
+            </a>
+          </div>
+        </div>
+
+        <div class="subtab-pane" data-pane="instagram">
+          <div class="li-post-content">${instagramDraft}</div>
+          <div class="li-post-actions">
+            <button class="btn btn-secondary btn-sm" onclick="copyLinkedInDraft(this, \`${encodeURIComponent(instagramDraft)}\`)">
+              <i class="fa-solid fa-copy"></i> Copy Caption
+            </button>
+            <a href="https://www.instagram.com/" target="_blank" class="btn btn-primary btn-sm">
+              <i class="fa-brands fa-instagram"></i> Open Instagram
+            </a>
+          </div>
+        </div>
+
+        <div class="subtab-pane" data-pane="midjourney">
+          <div class="li-post-content" style="font-family: monospace; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05);">${instagramPrompt}</div>
+          <div class="li-post-actions">
+            <button class="btn btn-secondary btn-sm" onclick="copyLinkedInDraft(this, \`${encodeURIComponent(instagramPrompt)}\`)">
+              <i class="fa-solid fa-copy"></i> Copy Prompt
+            </button>
+            <a href="https://discord.com/" target="_blank" class="btn btn-primary btn-sm">
+              <i class="fa-solid fa-image"></i> Open Midjourney
+            </a>
+          </div>
+        </div>
       </div>
     `;
     elements.linkedinDrafts.appendChild(postCard);
   });
 }
+
+// Global Switch Social Tab Helper
+window.switchSocialTab = (event, cardId, paneName) => {
+  const container = document.getElementById(`content-${cardId}`);
+  const tabsContainer = document.getElementById(`subtabs-${cardId}`);
+  if (!container || !tabsContainer) return;
+
+  tabsContainer.querySelectorAll('.subtab-btn').forEach(btn => btn.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+
+  container.querySelectorAll('.subtab-pane').forEach(pane => pane.classList.remove('active'));
+  const targetPane = container.querySelector(`.subtab-pane[data-pane="${paneName}"]`);
+  if (targetPane) targetPane.classList.add('active');
+};
 
 // ----------------------------------------------------
 // UI Form Actions
@@ -545,7 +621,7 @@ document.getElementById('linkedin-topics-form').addEventListener('submit', async
   generateBtn.disabled = true;
   generateBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Envy is writing...`;
   
-  showNotification("Drafting Posts...", "Envy is generating your 3 posts.");
+  showNotification("Drafting Posts...", "Envy is generating your social posts & image prompts.");
   
   const todayStr = new Date().toISOString().split('T')[0];
   
@@ -553,15 +629,18 @@ document.getElementById('linkedin-topics-form').addEventListener('submit', async
     const topicName = `Daily Topic #${i+1}`;
     const subject = topics[i];
     
-    // Generate draft using local Gemini
-    const draftText = await generateDraftViaGemini(subject);
+    // Generate drafts using local Gemini
+    const drafts = await generateAllDraftsViaGemini(subject);
     
-    // Save draft to sheet
+    // Save drafts to sheet
     await postToSheet({
       action: "updateLinkedInPost",
       date: todayStr,
       topic: topicName,
-      draft: draftText,
+      linkedin: drafts.linkedin,
+      twitter: drafts.twitter,
+      instagram: drafts.instagram,
+      instagramPrompt: drafts.prompt,
       status: "Draft"
     });
   }
@@ -569,49 +648,72 @@ document.getElementById('linkedin-topics-form').addEventListener('submit', async
   generateBtn.disabled = false;
   generateBtn.innerHTML = originalHtml;
   
-  showNotification("Drafts Completed!", "All 3 LinkedIn posts have been generated and synced.");
+  showNotification("Drafts Completed!", "All daily social posts have been generated and synced.");
   document.getElementById('linkedin-topics-form').reset();
   syncData();
 });
 
-async function generateDraftViaGemini(subject) {
-  const prompt = `Write an engaging, high-quality LinkedIn post about the following subject:
+async function generateAllDraftsViaGemini(subject) {
+  const prompt = `You are a social media manager. Generate high-quality social media posts for the following subject:
 "${subject}"
 
-Guidelines:
-1. Hook the reader in the first 2 lines.
-2. Use short, readable paragraphs (1-2 sentences max).
-3. Include bullet points or clear spacing.
-4. Keep a professional yet personal tone (share a key lesson, problem solved, or valuable tip).
-5. Add 3-5 relevant hashtags at the very end.
-6. Include emojis naturally to make it visually engaging but keep it professional.
-7. Avoid boring corporate jargon.
+For this subject, write:
+1. LinkedIn Post: Engaging, professional, lessons learned or key tips, bullet points, emoji, under 300 words.
+2. Twitter/X Post: Punchy, engaging, under 280 characters, hashtags.
+3. Instagram Caption: Engaging, visual description, casual tone, hashtags, emoji.
+4. Instagram Midjourney Image Prompt: A description of an image that would go perfectly with this Instagram post. Format it as an optimized Midjourney prompt, e.g., "A photo of ..., cinematic lighting, photorealistic --ar 1:1".
 
-Return only the final LinkedIn post content (do not include introductory or concluding conversational text).`;
+You MUST return the output ONLY as a valid JSON object. Do not include markdown code fence wrappers or backticks. The JSON object must have exactly these keys:
+{
+  "linkedin": "...",
+  "twitter": "...",
+  "instagram": "...",
+  "prompt": "..."
+}
+
+Ensure the values are JSON-safe strings (properly escaped quotes/newlines).`;
 
   try {
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${state.config.geminiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }]
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          responseMimeType: "application/json"
+        }
       })
     });
     
     const data = await response.json();
     if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text) {
-      return data.candidates[0].content.parts[0].text.trim();
-    } else {
-      console.warn("Gemini API warning. Response data:", data);
-      if (data.error && data.error.message) {
-        return `API Error: ${data.error.message}`;
+      let rawText = data.candidates[0].content.parts[0].text.trim();
+      if (rawText.startsWith("```json")) {
+        rawText = rawText.substring(7, rawText.length - 3).trim();
+      } else if (rawText.startsWith("```")) {
+        rawText = rawText.substring(3, rawText.length - 3).trim();
+      }
+      try {
+        const parsed = JSON.parse(rawText);
+        return {
+          linkedin: parsed.linkedin || '',
+          twitter: parsed.twitter || '',
+          instagram: parsed.instagram || '',
+          prompt: parsed.prompt || ''
+        };
+      } catch (err) {
+        console.error("JSON parse error:", rawText, err);
       }
     }
   } catch (error) {
-    console.error("Gemini failed to generate draft:", error);
-    return `JavaScript Error: ${error.message}`;
+    console.error("Gemini failed to generate drafts:", error);
   }
-  return "Failed to generate draft. Please check your API key.";
+  return {
+    linkedin: "Failed to generate LinkedIn draft.",
+    twitter: "Failed to generate Twitter draft.",
+    instagram: "Failed to generate Instagram draft.",
+    prompt: "Failed to generate Image prompt."
+  };
 }
 
 // ----------------------------------------------------
@@ -815,6 +917,53 @@ function initChat() {
       sendMessage();
     }
   });
+
+  // Speech Recognition Implementation
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (SpeechRecognition) {
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+
+    recognition.onstart = () => {
+      elements.chatMic.innerHTML = `<i class="fa-solid fa-microphone-lines fa-fade" style="color: var(--primary-color);"></i>`;
+      elements.chatMic.classList.add('recording');
+      showNotification("Listening...", "Speak clearly into your microphone.");
+    };
+
+    recognition.onend = () => {
+      elements.chatMic.innerHTML = `<i class="fa-solid fa-microphone"></i>`;
+      elements.chatMic.classList.remove('recording');
+    };
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      elements.chatInput.value = transcript;
+      elements.chatInput.focus();
+    };
+
+    recognition.onerror = (event) => {
+      console.error("Speech recognition error:", event.error);
+      elements.chatMic.innerHTML = `<i class="fa-solid fa-microphone"></i>`;
+      elements.chatMic.classList.remove('recording');
+      showNotification("Speech Error", `Could not transcribe: ${event.error}`, "danger");
+    };
+
+    elements.chatMic.addEventListener('click', () => {
+      if (elements.chatMic.classList.contains('recording')) {
+        recognition.stop();
+      } else {
+        recognition.start();
+      }
+    });
+  } else {
+    elements.chatMic.title = "Speech Recognition not supported in this browser";
+    elements.chatMic.style.opacity = "0.5";
+    elements.chatMic.addEventListener('click', () => {
+      showNotification("Unsupported Browser", "Speech-to-Text is not supported on this browser.", "warning");
+    });
+  }
 }
 
 function appendChatMessage(sender, text, type) {
