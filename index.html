@@ -13,13 +13,21 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
+  <!-- Sidebar Mobile Overlay -->
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
   <div class="app-container">
     
     <!-- Sidebar Navigation -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
       <div class="brand">
-        <i class="fa-solid fa-wand-magic-sparkles logo-icon"></i>
-        <span>Envy</span>
+        <div class="brand-logo">
+          <i class="fa-solid fa-wand-magic-sparkles logo-icon"></i>
+          <span>Envy</span>
+        </div>
+        <button id="mobile-menu-close" class="mobile-menu-close" title="Close Menu">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
       </div>
       <nav class="nav-menu">
         <a href="#" class="nav-item active" data-tab="dashboard">
@@ -50,6 +58,9 @@
       
       <!-- Top header bar -->
       <header class="top-header">
+        <button id="mobile-menu-btn" class="mobile-menu-btn" title="Toggle Menu">
+          <i class="fa-solid fa-bars"></i>
+        </button>
         <div class="header-title">
           <h1 id="page-title">Dashboard Overview</h1>
           <p id="page-subtitle">Your personal workspace & automations status</p>
